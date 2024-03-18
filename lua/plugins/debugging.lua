@@ -52,6 +52,31 @@ return {
 					end
 				end,
 			},
+			{
+				-- The first three options are required by nvim-dap
+				type = "python", -- the type here established the link to the adapter definition: `dap.adapters.python`
+				request = "launch",
+				name = "mnsit test",
+
+				-- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
+
+				program = "${workspaceFolder}/mnist.py", -- This configuration will launch the current file if used.
+				pythonPath = function()
+					-- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
+					-- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
+					-- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
+					local cwd = vim.fn.getcwd()
+					if vim.fn.executable(cwd .. "/venv/bin/python") == 1 then
+						return cwd .. "/venv/bin/python"
+					elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
+						return cwd .. "/.venv/bin/python"
+					elseif vim.fn.executable("/Users/matthewernst/miniconda3/envs/mlx-env/bin/python") == 1 then
+						return "/Users/matthewernst/miniconda3/envs/mlx-env/bin/python"
+					else
+						return "/usr/bin/python"
+					end
+				end,
+			},
 		}
 
 		dap.listeners.before.attach.dapui_config = function()
@@ -71,5 +96,6 @@ return {
 		vim.keymap.set("n", "<Leader>dc", ":DapContinue<CR>")
 		vim.keymap.set("n", "<Leader>dx", ":DapTerminate<CR>")
 		vim.keymap.set("n", "<Leader>do", ":DapStepOver<CR>")
+		vim.keymap.set("n", "<Leader>di", ":DapStepInto<CR>")
 	end,
 }
