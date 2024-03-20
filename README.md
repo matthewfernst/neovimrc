@@ -9,6 +9,7 @@ This is the default location of where nvim will look for loading configurations.
 see neovim start to install the plugins for this configurations. Once complete, you can quit neovim with `:qwa` (yes I just showed you how to quit vim) and 
 neovim will reload with the plugins added!
 
+Oh also, to see all the cool glyphs/icons, I use which can be downloaded [here](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/Hack.zip).
 
 ### Neovim is 🔥🔥🔥
 
