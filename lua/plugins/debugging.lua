@@ -47,6 +47,8 @@ return {
 						return cwd .. "/venv/bin/python"
 					elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
 						return cwd .. "/.venv/bin/python"
+					elseif vim.fn.executable("/Users/matthewernst/miniconda3/envs/homl3/bin/python") == 1 then
+						return "/Users/matthewernst/miniconda3/envs/homl3/bin/python"
 					else
 						return "/usr/bin/python"
 					end
