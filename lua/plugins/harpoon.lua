@@ -10,11 +10,21 @@ return {
 		-- REQUIRED
 
 		vim.keymap.set("n", "<leader>a", function()
-			harpoon:list():append()
+			harpoon:list():add()
+		end)
+		vim.keymap.set("n", "<leader>x", function()
+			harpoon:list():remove()
 		end)
 		vim.keymap.set("n", "<C-e>", function()
 			harpoon.ui:toggle_quick_menu(harpoon:list())
 		end)
+    vim.keymap.set("n", "<C-V>", function()
+      local curline = vim.api.nvim_get_current_line()
+      local working_directory = vim.fn.getcwd() .. "/"
+      vim.cmd("vs")
+      vim.cmd("e " .. working_directory .. curline)
+    end, { buffer = true, noremap = true, silent = true })
+
 
 		vim.keymap.set("n", "<C-h>", function()
 			harpoon:list():select(1)
