@@ -1,4 +1,4 @@
 return {
   "tpope/vim-commentary",
-  name = "vim-commentary"
+  name = "vim-commentary",
 }
