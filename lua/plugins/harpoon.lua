@@ -11,13 +11,16 @@ return {
 
 		vim.keymap.set("n", "<leader>a", function()
 			harpoon:list():add()
-		end)
+		end, { desc = "Add File from Harpoon" })
+
 		vim.keymap.set("n", "<leader>x", function()
 			harpoon:list():remove()
-		end)
+		end, { desc = "Remove File from Harpoon" })
+
 		vim.keymap.set("n", "<C-e>", function()
 			harpoon.ui:toggle_quick_menu(harpoon:list())
-		end)
+		end, { desc = "Toggle Harpoon Menu" })
+
 		vim.keymap.set("n", "<C-s>", function()
 			local curline = vim.api.nvim_get_current_line()
 			local working_directory = vim.fn.getcwd() .. "/"
