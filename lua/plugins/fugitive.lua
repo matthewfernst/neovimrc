@@ -31,6 +31,9 @@ return {
 				vim.keymap.set("n", "<leader>gm", function()
 					vim.cmd.Git("commit")
 				end, { desc = "git commit" })
+				vim.keymap.set("n", "<leader>ga", function()
+					vim.cmd.Git("commit --amend")
+				end, { desc = "git commit --amend" })
 			end,
 		})
 	end,

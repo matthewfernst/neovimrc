@@ -6,7 +6,7 @@ return {
 		config = function()
 			local builtin = require("telescope.builtin")
 			vim.keymap.set("n", "<leader>pf", builtin.find_files, { desc = "Find Project Files" })
-			vim.keymap.set("n", "<leader>pg", builtin.live_grep, { desc = "Grep Project Files" })
+			vim.keymap.set("n", "<leader>pg", ":Telescope live_grep search_dirs=.<CR>", { desc = "Grep Project Files" })
 			vim.keymap.set("n", "<leader>pl", builtin.lsp_document_symbols, { desc = "Search Symbols in Current File" })
 		end,
 	},
