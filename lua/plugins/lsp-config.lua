@@ -30,7 +30,11 @@ return {
 			lspconfig.lua_ls.setup({})
 			lspconfig.pyright.setup({})
 			lspconfig.tsserver.setup({})
-			lspconfig.clangd.setup({})
+			lspconfig.clangd.setup({
+        init_options = {
+          fallbackFlags = {'--std=c++17'}
+        }
+      })
 			lspconfig.rust_analyzer.setup({
 				settings = {
 					["rust-analyzer"] = {
