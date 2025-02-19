@@ -1,207 +1,82 @@
 return {
-  "mfussenegger/nvim-dap",
+  'mfussenegger/nvim-dap',
   dependencies = {
-    "mfussenegger/nvim-dap-python",
-    "rcarriga/nvim-dap-ui",
+    -- Creates a beautiful debugger UI
+    'rcarriga/nvim-dap-ui',
+    'nvim-neotest/nvim-nio',
+
+    -- Installs the debug adapters for you
+    'williamboman/mason.nvim',
+    'jay-babu/mason-nvim-dap.nvim',
+
+    -- Add your own debuggers here
+    'leoluz/nvim-dap-go',
+    'mfussenegger/nvim-dap-python',
   },
   config = function()
-    require("dapui").setup({
+    local dap = require 'dap'
+    local dapui = require 'dapui'
+
+    require('mason-nvim-dap').setup {
+      -- Makes a best effort to setup the various debuggers with
+      -- reasonable debug configurations
+      automatic_setup = true,
+      automatic_installation = true,
+
+      -- You can provide additional configuration to the handlers,
+      -- see mason-nvim-dap README for more information
+      handlers = {},
+
+      -- You'll need to check that you have the required things installed
+      -- online, please don't ask me how to install them :)
+      ensure_installed = {
+        -- Update this to ensure that you have the debuggers for the langs you want
+        -- 'delve',
+        'debugpy',
+      },
+    }
+
+    -- Basic debugging keymaps, feel free to change to your liking!
+    vim.keymap.set('n', '<F5>', dap.continue, { desc = 'Debug: Start/Continue' })
+    vim.keymap.set('n', '<F1>', dap.step_into, { desc = 'Debug: Step Into' })
+    vim.keymap.set('n', '<F2>', dap.step_over, { desc = 'Debug: Step Over' })
+    vim.keymap.set('n', '<F3>', dap.step_out, { desc = 'Debug: Step Out' })
+    vim.keymap.set('n', '<leader>b', dap.toggle_breakpoint, { desc = 'Debug: Toggle Breakpoint' })
+    vim.keymap.set('n', '<leader>B', function()
+      dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ')
+    end, { desc = 'Debug: Set Breakpoint' })
+
+    -- Dap UI setup
+    -- For more information, see |:help nvim-dap-ui|
+    dapui.setup {
+      -- Set icons to characters that are more likely to work in every terminal.
+      --    Feel free to remove or use ones that you like more! :)
+      --    Don't feel like these are good choices.
+      icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
       controls = {
-        element = "repl",
-        enabled = true,
         icons = {
-          disconnect = "",
-          pause = "",
-          play = "",
-          run_last = "",
-          step_back = "",
-          step_into = "",
-          step_out = "",
-          step_over = "",
-          terminate = "",
+          pause = '⏸',
+          play = '▶',
+          step_into = '⏎',
+          step_over = '⏭',
+          step_out = '⏮',
+          step_back = 'b',
+          run_last = '▶▶',
+          terminate = '⏹',
+          disconnect = '⏏',
         },
-      },
-      element_mappings = {},
-      expand_lines = true,
-      floating = {
-        border = "single",
-        mappings = {
-          close = { "q", "<Esc>" },
-        },
-      },
-      force_buffers = true,
-      icons = {
-        collapsed = "",
-        current_frame = "",
-        expanded = "",
-      },
-      layouts = {
-        {
-          elements = {
-            {
-              id = "scopes",
-              size = 0.25,
-            },
-            {
-              id = "breakpoints",
-              size = 0.25,
-            },
-            {
-              id = "stacks",
-              size = 0.25,
-            },
-            {
-              id = "watches",
-              size = 0.25,
-            },
-          },
-          position = "left",
-          size = 40,
-        },
-        {
-          elements = {
-            {
-              id = "repl",
-              size = 1.0,
-            },
-          },
-          position = "bottom",
-          size = 10,
-        },
-      },
-      mappings = {
-        edit = "e",
-        expand = { "<CR>", "<2-LeftMouse>" },
-        open = "o",
-        remove = "d",
-        repl = "r",
-        toggle = "t",
-      },
-      render = {
-        indent = 1,
-        max_value_lines = 100,
-      },
-    })
-    require("dap-python").setup("/Users/matthewernst/miniconda3/envs/mlx-env/bin/python")
-    local dap, dapui = require("dap"), require("dapui")
-
-    dap.adapters.lldb = {
-      type = "executable",
-      command = "/usr/bin/lldb",
-      name = "lldb",
-    }
-
-    dap.configurations.cpp = {
-      -- Example
-      {
-        name = "graph_test",
-        type = "lldb",
-        request = "launch",
-        program = "graph_test",
-        cwd = "${workspaceFolder}",
-        stopOnEntry = false,
-        args = {},
       },
     }
 
-    dap.configurations.python = {
-      {
-        -- The first three options are required by nvim-dap
-        type = "python", -- the type here established the link to the adapter definition: `dap.adapters.python`
-        request = "launch",
-        name = "Launch file",
+    -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
+    vim.keymap.set('n', '<F7>', dapui.toggle, { desc = 'Debug: See last session result.' })
 
-        -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
+    dap.listeners.after.event_initialized['dapui_config'] = dapui.open
+    dap.listeners.before.event_terminated['dapui_config'] = dapui.close
+    dap.listeners.before.event_exited['dapui_config'] = dapui.close
 
-        program = "${file}", -- This configuration will launch the current file if used.
-        pythonPath = function()
-          -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
-          -- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
-          -- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
-          local cwd = vim.fn.getcwd()
-          if vim.fn.executable(cwd .. "/venv/bin/python") == 1 then
-            return cwd .. "/venv/bin/python"
-          elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
-            return cwd .. "/.venv/bin/python"
-            -- elseif vim.fn.executable("/Users/matthewernst/miniconda3/envs/homl3/bin/python") == 1 then
-            -- 	return "/Users/matthewernst/miniconda3/envs/homl3/bin/python"
-          elseif vim.fn.executable("/Users/matthewernst/miniconda3/envs/mlx-env/bin/python") == 1 then
-            return "/Users/matthewernst/miniconda3/envs/mlx-env/bin/python"
-          else
-            return "/usr/bin/python"
-          end
-        end,
-      },
-      {
-        -- The first three options are required by nvim-dap
-        type = "python", -- the type here established the link to the adapter definition: `dap.adapters.python`
-        request = "launch",
-        name = "mnsit test",
-
-        -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
-
-        program = "${workspaceFolder}/mnist.py", -- This configuration will launch the current file if used.
-        pythonPath = function()
-          -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
-          -- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
-          -- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
-          local cwd = vim.fn.getcwd()
-          if vim.fn.executable(cwd .. "/venv/bin/python") == 1 then
-            return cwd .. "/venv/bin/python"
-          elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
-            return cwd .. "/.venv/bin/python"
-          elseif vim.fn.executable("/Users/matthewernst/miniconda3/envs/mlx-env/bin/python") == 1 then
-            return "/Users/matthewernst/miniconda3/envs/mlx-env/bin/python"
-          else
-            return "/usr/bin/python"
-          end
-        end,
-      },
-      {
-        -- The first three options are required by nvim-dap
-        type = "python", -- the type here established the link to the adapter definition: `dap.adapters.python`
-        request = "launch",
-        name = "LRNN",
-
-        -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
-
-        program = "${workspaceFolder}/src/python/late_residual_connections/run_experiment_script.py",
-        pythonPath = function()
-          -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
-          -- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
-          -- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
-          local cwd = vim.fn.getcwd()
-          if vim.fn.executable(cwd .. "/venv/bin/python") == 1 then
-            return cwd .. "/venv/bin/python"
-          elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
-            return cwd .. "/.venv/bin/python"
-          elseif vim.fn.executable("/Users/matthewernst/miniconda3/envs/torch-env/bin/python") == 1 then
-            return "/Users/matthewernst/miniconda3/envs/torch-env/bin/python"
-          else
-            return "/usr/bin/python"
-          end
-        end,
-      },
-    }
-
-    dap.listeners.before.attach.dapui_config = function()
-      dapui.open()
-    end
-    dap.listeners.before.launch.dapui_config = function()
-      dapui.open()
-    end
-    dap.listeners.before.event_terminated.dapui_config = function()
-      dapui.close()
-    end
-    dap.listeners.before.event_exited.dapui_config = function()
-      dapui.close()
-    end
-
-    vim.keymap.set("n", "<Leader>db", ":DapToggleBreakpoint<CR>")
-    vim.keymap.set("n", "<Leader>dc", ":DapContinue<CR>")
-    vim.keymap.set("n", "<Leader>dx", ":DapTerminate<CR>")
-    vim.keymap.set("n", "<Leader>dn", ":DapStepOver<CR>")
-    vim.keymap.set("n", "<Leader>do", ":DapStepOut<CR>")
-    vim.keymap.set("n", "<Leader>di", ":DapStepInto<CR>")
+    -- Install golang specific config
+    -- require('dap-go').setup()
+    require('dap-python').setup()
   end,
 }
