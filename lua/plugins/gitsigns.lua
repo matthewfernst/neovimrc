@@ -41,7 +41,7 @@ return {
 				col = 1,
 			},
 			yadm = {
-				enable = false,
+				enabled = false,
 			},
 		})
 		vim.keymap.set("n", "<leader>gh", ":Gitsigns preview_hunk<CR>", { desc = "Preview Hunk" })
