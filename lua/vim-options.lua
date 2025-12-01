@@ -30,8 +30,6 @@ vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
 
-vim.opt.colorcolumn = "120"
-
 -- greatest remap ever
 vim.keymap.set("x", "<leader>p", [["_dP]])
 

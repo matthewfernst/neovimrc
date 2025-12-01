@@ -1,38 +1,26 @@
---function ColorMyPencils(color)
---    color = color or "catppuccin-mocha"
---    vim.cmd.colorscheme(color)
---
---    vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
---    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
---end
-
 return {
---  {
---    "rose-pine/neovim",
---    name = "rose-pine",
---    config = function()
---      require("rose-pine").setup({
---        disable_background = true,
---      })
---
---      --            vim.cmd("colorscheme rose-pine")
---
---      --            ColorMyPencils()
---    end,
---  },
- -- {
- --   "catppuccin/nvim",
- --   name = "catppuccin",
- --   priority = 1000,
- --   config = function()
- --     vim.cmd.colorscheme("catppuccin")
- --   end,
- -- },
-  { 'dasupradyumna/midnight.nvim',
-    lazy = false,
-    priority = 1000,
-   config = function()
-     vim.cmd.colorscheme("midnight")
-   end,
+  -- {
+  --   "folke/tokyonight.nvim",
+  --   lazy = false,
+  --   priority = 1000,
+  --   opts = {},
+  --   config = function()
+  --     require('tokyonight').setup({
+  --       style = "day"
+  --     })
+  --     vim.cmd[[colorscheme tokyonight]]
+  --   end
+  -- }
+  {
+    "olimorris/onedarkpro.nvim",
+    priority = 1000, -- make sure to load this before all the other start plugins
+    config = function()
+      require("onedarkpro").setup({
+      colors = {
+        bg = "#21252b",
+      }
+      })
+      vim.cmd [[colorscheme onedark]]
+    end
   }
 }
